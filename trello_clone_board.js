@@ -40,7 +40,7 @@ var copyList = function(toBoardId, listModel) {
 	//console.log(listModel);
 	createList({
 		idBoard: toBoardId,
-		name: list.name,
+		name: list.name + " --boardId:"+toBoardId,
 		pos: list.pos,
 		closed: list.closed
 	}, function(newList) {
@@ -65,7 +65,7 @@ var copyCard = function(toBoardId, toListId, cardModel) {
 		pos: 	 card.pos,
 		desc: 	 card.desc,
 		closed:  card.closed,
-		name: 	 card.name
+		name: 	 card.name + " --listId:"+toListId
 	}, function(newCard) {
 		var newCardId = newCard._id;
 		
@@ -84,7 +84,7 @@ var copyChecklist = function(toBoardId, toListId, toCardId, checklistModel, call
 	// create a new checklist (add it to the board)
 	createChecklist({
 		idBoard: toBoardId,
-		name: checklist.name
+		name: checklist.name + " --cardId:"+toCardId
 	}, function(newChecklist) {
 		var newChecklistId = newChecklist._id;
 		
