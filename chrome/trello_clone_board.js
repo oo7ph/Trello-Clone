@@ -1,3 +1,4 @@
+var debugMode = false;
 var token = "4ec4c13d862588493a0b6592/93b1188a8a447de9e811a8b0b8dae8242c90ddb608a093e834fbb6c1eb6bb0f1";
 var idBoard = boardView.model.get("id");
 var log = function() { console.log(this, arguments); };
@@ -37,10 +38,10 @@ var cloneBoard = function(board, callback) {
 /** Copies a list and all its cards to a different board. */
 var copyList = function(toBoardId, listModel) {
 	var list = listModel.toJSON();
-	//console.log(listModel);
+	//console.log(debugMode);
 	createList({
 		idBoard: toBoardId,
-		name: list.name + " --boardId:"+toBoardId,
+		name: debugMode ? (list.name + " --boardId:"+toBoardId) : list.name,
 		pos: list.pos,
 		closed: list.closed
 	}, function(newList) {
@@ -65,10 +66,21 @@ var copyCard = function(toBoardId, toListId, cardModel) {
 		pos: 	 card.pos,
 		desc: 	 card.desc,
 		closed:  card.closed,
-		name: 	 card.name + " --listId:"+toListId
+		name: 	 debugMode ? (card.name + " --listId:"+toListId) : card.name
 	}, function(newCard) {
 		var newCardId = newCard._id;
-		
+		//Update Card with Extra Attributes
+		updateCard({
+			idList:		toListId,
+			idBoard:	toBoardId,
+			idCard:		newCardId,
+			updates:	_.map(
+				card.labels,
+				function(label){
+					return {"addToSet":{labels:label}};
+				}
+			)
+		});
 		// copy checklists
 		var checklistModels = cardModel.checklistList.models;
 		for(var i=0; i<checklistModels.length; i++) {
@@ -84,7 +96,7 @@ var copyChecklist = function(toBoardId, toListId, toCardId, checklistModel, call
 	// create a new checklist (add it to the board)
 	createChecklist({
 		idBoard: toBoardId,
-		name: checklist.name + " --cardId:"+toCardId
+		name: debugMode ? (checklist.name + " --cardId:"+toCardId) : checklist.name
 	}, function(newChecklist) {
 		var newChecklistId = newChecklist._id;
 		
