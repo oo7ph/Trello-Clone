@@ -4,7 +4,7 @@
 With the click of a button
 
 * Copy Board
-	* Prefrences
+	* Preferences
 	* Organization
 	* Descriptions
 	* Lists
