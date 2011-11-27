@@ -1,14 +1,12 @@
 var debugMode = false;
-var token = "4ec4c13d862588493a0b6592/93b1188a8a447de9e811a8b0b8dae8242c90ddb608a093e834fbb6c1eb6bb0f1";
-var idBoard = boardView.model.get("id");
 var log = function() { console.log(this, arguments); };
 
 /**Clones the current board
 	@param newBoardName
 	@param callback
 */
-var cloneCurrentBoard = function(newBoardName, callback){
-	cloneBoard(boardView.model.toJSON(), newBoardName, callback);
+var cloneCurrentBoard = function(newBoardName) {
+	cloneBoard(boardView.model.toJSON(), newBoardName);
 }
 
 /** Copies a given board, including all lists and cards, into a new board with the given name.
@@ -17,7 +15,7 @@ var cloneCurrentBoard = function(newBoardName, callback){
 	@param callback
 */
 
-var cloneBoard = function(fromBoard, newBoardName, callback) {
+var cloneBoard = function(fromBoard, newBoardName) {
 	// create a new board
 	createBoard(
 		_.extend({},fromBoard,{name:newBoardName}),
@@ -26,27 +24,38 @@ var cloneBoard = function(fromBoard, newBoardName, callback) {
 			var newBoardId = data._id;
 			
 			// archive default lists
-			for(var i=0; i<data.lists.length; i++) {
-				archiveList(newBoardId, data.lists[i]._id);
-			}
+			//for(var i=0; i<data.lists.length; i++) {
+			//	archiveList(newBoardId, data.lists[i]._id);
+			//}
+
+			var archiveListQueue = _.map(data.lists, function(list) {
+				return function(callback) {
+					archiveList(newBoardId, list._id, callback);
+				};
+			});
 			
 			// copy lists from current board into the new board
 			var listModels = boardView.model.listList.models;
-			for(var i=0; i<listModels.length; i++) {
-				copyList(newBoardId, listModels[i]);
-			}
+			//for(var i=0; i<listModels.length; i++) {
+			//	copyList(newBoardId, listModels[i], log);
+			//}
 			
-			// TODO: We have to wait until all ajax requests finish before redirecting
-			// redirect to new board
-			//location.href = "/board/" + newBoardId;
+			var copyListQueue = _.map(listModels, function(listModel) {
+				return function(callback) {
+					copyList(newBoardId, listModel, callback);
+				};
+			});
+			callAfterDone(archiveListQueue.concat(copyListQueue), function() {
+				// redirect to new board
+				location.href = "https://trello.com/board/" + newBoardId;
+			});
 		}
 	);
 };
 
 /** Copies a list and all its cards to a different board. */
-var copyList = function(toBoardId, listModel) {
+var copyList = function(toBoardId, listModel, callback) {
 	var list = listModel.toJSON();
-	//console.log(debugMode);
 	createList({
 		idBoard: toBoardId,
 		name: debugMode ? (list.name + " --boardId:"+toBoardId) : list.name,
@@ -57,14 +66,21 @@ var copyList = function(toBoardId, listModel) {
 		
 		// copy cards
 		var cardModels = listModel.cardList.models;
-		for(var i=0; i<cardModels.length; i++) {
-			copyCard(toBoardId, newListId, cardModels[i]);
-		}
+		//for(var i=0; i<cardModels.length; i++) {
+		//	copyCard(toBoardId, newListId, cardModels[i], log);
+		//}
+
+		var copyCardQueue = _.map(cardModels, function(cardModel) {
+			return function(callback) {
+				copyCard(toBoardId, newListId, cardModel, callback);
+			};
+		});
+		callAfterDone(copyCardQueue, callback);
 	});
 }
 
 /** Copies a card and all its checklists to a different list. */
-var copyCard = function(toBoardId, toListId, cardModel) {
+var copyCard = function(toBoardId, toListId, cardModel, callback) {
 	var card = cardModel.toJSON();
 	
 	// create the new card
@@ -77,23 +93,36 @@ var copyCard = function(toBoardId, toListId, cardModel) {
 		name: 	 debugMode ? (card.name + " --listId:"+toListId) : card.name
 	}, function(newCard) {
 		var newCardId = newCard._id;
-		//Update Card with Extra Attributes
-		updateCard({
-			idList:		toListId,
-			idBoard:	toBoardId,
-			idCard:		newCardId,
-			updates:	_.map(
-				card.labels,
-				function(label){
-					return {"addToSet":{labels:label}};
-				}
-			)
-		});
+
+		// update card with extra attributes
+		var updateAction = function(callback) {
+			updateCard({
+				idList:		toListId,
+				idBoard:	toBoardId,
+				idCard:		newCardId,
+				updates:	_.map(
+					card.labels,
+					function(label){
+						return {"addToSet":{labels:label}};
+					}
+				)
+			});
+		};
+
 		// copy checklists
 		var checklistModels = cardModel.checklistList.models;
-		for(var i=0; i<checklistModels.length; i++) {
-			copyChecklist(toBoardId, toListId, newCardId, checklistModels[i]);
-		}
+		//for(var i=0; i<checklistModels.length; i++) {
+		//	copyChecklist(toBoardId, toListId, newCardId, checklistModels[i], log);
+		//}
+
+		var copyQueue = _.map(checklistModels, function(checklistModel) {
+			return function(callback) {
+				copyChecklist(toBoardId, toListId, newCardId, checklistModel, callback);
+			};
+		});
+
+		callback();
+		callAfterDone([updateAction].concat(copyQueue), callback);
 	});
 };
 
@@ -117,16 +146,30 @@ var copyChecklist = function(toBoardId, toListId, toCardId, checklistModel, call
 		}, function() {			
 			// copy tasks to checklist
 			var taskModels = checklistModel.checkItemList.models;
-			for(var i=0; i<taskModels.length; i++) {
-				var task = taskModels[i].toJSON();
-				addTaskToChecklist({
-					idChecklist: 	newChecklistId,
-					name:		 	task.name,
-					pos:		 	task.pos,
-					idBoard: 	 	toBoardId
-					//idPlaceholder: 	"???"
-				});
-			}
+			//for(var i=0; i<taskModels.length; i++) {
+			//	var task = taskModels[i].toJSON();
+			//	addTaskToChecklist({
+			//		idChecklist: 	newChecklistId,
+			//		name:		 	task.name,
+			//		pos:		 	task.pos,
+			//		idBoard: 	 	toBoardId
+			//		//idPlaceholder: 	"???"
+			//	});
+			//}
+
+			var addTaskQueue = _.map(taskModels, function(taskModel) {
+				return function(callback) {
+					var task = taskModel.toJSON();
+					addTaskToChecklist({
+						idChecklist: 	newChecklistId,
+						name:		 	task.name,
+						pos:		 	task.pos,
+						idBoard: 	 	toBoardId
+						//idPlaceholder: 	"???"
+					});
+				};
+			});
+			callAfterDone(addTaskQueue, callback);
 		});
 	});
 };
@@ -153,9 +196,11 @@ var createBoard = function(board, callback) {
 			"permissionLevel" : board.privacy
 		}
 	};
+
 	if(board.idOrganization){
 		attributes.idOrganization = board.idOrganization;
 	}
+
 	post({
 		url: "/api/board",
 		success: callback,
@@ -328,7 +373,7 @@ var updateList = function(list, callback) {
 /** Gets all current data for the given board. */
 var getBoardData = function(idBoard, callback) {
 	$.get("/data/board/" + idBoard + "/current", callback);
-}
+};
 
 /** A simplified POST. 
 	@param args.url
@@ -337,6 +382,11 @@ var getBoardData = function(idBoard, callback) {
 	@param args.success
 */
 var post = function(args) {
+
+	var isToken = function(s) { return s.indexOf("token=") === 0; };
+	var tokenKeyValue = _.find(document.cookie.split(/\W*;\W*/), isToken);
+	var token = unescape(tokenKeyValue.split("=")[1]);
+
 	$.ajax({
 		type: "post",
 		dataType: "json",
@@ -350,4 +400,31 @@ var post = function(args) {
 		}),
 		success: args.success
 	});
-}
+};
+
+
+/*******************
+ * Utility
+ *******************/
+
+/** Invokes a callback after all the given asynchronous functions have completed. All asynchronous functions must accept a single callback argument. */
+var callAfterDone = function(queue, callback) {
+
+	var count = queue.length;
+
+	if(count === 0) {
+		callback();
+	}
+	else {
+		var decAndCheck = function() {
+			if(--count <= 0) {
+				callback();
+			}
+		};
+
+		for(var i=0; i<queue.length; i++) {
+			queue[i](decAndCheck);
+		}
+	}
+};
+

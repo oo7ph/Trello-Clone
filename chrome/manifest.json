@@ -1,0 +1,11 @@
+{
+  "name": "Trello Clone",
+  "version": "1.0",
+  "description": "Clone a Trello Board",
+  "content_scripts": [
+    {
+		"matches": ["https://trello.com/board/*"],
+		"js": ["jquery.min.js", "livequery_source.js", "injectScript.js", "inject.js", "trello_clone_button_source.js", "trello_clone_source.js"]
+	}
+  ]
+}
