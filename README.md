@@ -20,7 +20,7 @@ With the click of a button
 	1. We add a button to your right side Trello navigation called 'Clone Board'.
 	2. You click the button
 	3. You pick a name for the new Board.
-	3. We clone the active board, and take you to it.
+	4. We clone the active board, and take you to it.
 	
 ## Why is this cool?
 * Trello does not support templating functionality
