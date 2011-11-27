@@ -3,16 +3,24 @@ var token = "4ec4c13d862588493a0b6592/93b1188a8a447de9e811a8b0b8dae8242c90ddb608
 var idBoard = boardView.model.get("id");
 var log = function() { console.log(this, arguments); };
 
-/** Copies the current board, including all lists and cards, into a new board with the given name.
-	@param board.name
-	@param board.privacy
+/**Clones the current board
+	@param newBoardName
 	@param callback
 */
-var cloneBoard = function(board, callback) {
-	
+var cloneCurrentBoard = function(newBoardName, callback){
+	cloneBoard(boardView.model.toJSON(), newBoardName, callback);
+}
+
+/** Copies a given board, including all lists and cards, into a new board with the given name.
+	@param fromBoard @see createBoard
+	@param newBoardName
+	@param callback
+*/
+
+var cloneBoard = function(fromBoard, newBoardName, callback) {
 	// create a new board
 	createBoard(
-		board,
+		_.extend({},fromBoard,{name:newBoardName}),
 		function(data) {
 		
 			var newBoardId = data._id;
@@ -125,24 +133,35 @@ var copyChecklist = function(toBoardId, toListId, toCardId, checklistModel, call
 
 /** Creates a new board with the given name. 
 	@param board.name
+	@param board.desc
+	@param board.labelNames
+	@param board.idOrganization
+	@param board.prefs
 	@param board.privacy
 	@param callback
 */
 var createBoard = function(board, callback) {
 	var board = board || {};
 	board.privacy = board.privacy || "private";
+	var attributes = {
+		"name": board.name,
+		"desc": board.desc,
+		"labelNames": board.labelNames,
+		"prefs": board.prefs,
+		"closed": false, 
+		"prefs": {
+			"permissionLevel" : board.privacy
+		}
+	};
+	if(board.idOrganization){
+		attributes.idOrganization = board.idOrganization;
+	}
 	post({
 		url: "/api/board",
 		success: callback,
 		method: "create",
 		data: {
-			"attrs": {
-				"name": board.name,
-				"closed": false, 
-				"prefs": {
-					"permissionLevel" : board.privacy
-				}
-			},
+			"attrs": attributes,
 			"idParents":[]
 		}
 	});
