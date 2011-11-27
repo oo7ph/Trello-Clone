@@ -29,7 +29,7 @@ With the click of a button
 	* JQuery
 	* Underscore
 	* Live Query
-	* Custom Asyncronous Coninuation Passing Style
+	* Custom Asyncronous Continuation Passing Style
 	* Google Chrome Extentions (with javascript injection hack)
 	
 ## Credits
