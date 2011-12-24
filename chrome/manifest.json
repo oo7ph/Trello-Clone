@@ -1,13 +1,20 @@
 {
   "name": "Trello Clone",
-  "version": "0.1",
+  "version": "0.2",
   "description": "Clone a Trello Board",
-  "icons": { "128": "128-icon.png" },
+  "icons": { "128": "images/128-icon.png" },
   "homepage_url": "https://github.com/oo7ph/Trello-Clone",
   "content_scripts": [
     {
 		"matches": ["https://trello.com/board/*"],
-		"js": ["jquery.min.js", "livequery_source.js", "injectScript.js", "inject.js", "trello_clone_button_source.js", "trello_clone_source.js"]
+		"js": [
+			"lib/jquery.min.js", 
+			"inject/livequery.js", 
+			"lib/injectScript.js", 
+			"source/inject.js", 
+			"inject/trello_clone_button.js", 
+			"inject/trello_clone.js"
+		]
 	}
   ]
 }

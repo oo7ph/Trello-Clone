@@ -1,0 +1,1 @@
+The source folder contains the original javascript source code for the chrome extension. They must be escaped, stored as strings, and injected using injectScript in order to have access to the host page's DOM. The injectable versions of she source can be found in the /inject folder.
