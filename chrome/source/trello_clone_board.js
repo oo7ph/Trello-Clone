@@ -1,15 +1,10 @@
 /*
-** Trello-Clone v0.1 - https://github.com/oo7ph/Trello-Clone
-** Clone Trello Boards
-**
-** Orig:
-** Phillip Epstein <https://github.com/oo7ph>
-** Raine Lourie <https://github.com/RaineOrShine>
-**
-** Changelog:
-** v0.1
-** - Initial release
-**
+* Trello-Clone https://github.com/oo7ph/Trello-Clone
+* Clone Trello Boards
+*
+* Authors:
+*   Phillip Epstein <https://github.com/oo7ph>
+*   Raine Lourie <https://github.com/RaineOrShine>
 */
 
 var debugMode = false;
