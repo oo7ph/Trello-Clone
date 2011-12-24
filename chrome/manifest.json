@@ -10,7 +10,7 @@
 		"js": [
 			"inject/jquery.livequery.js",
 			"inject/trello_clone_button.js",
-			"inject/trello_clone.js",
+			"inject/trello_clone_board.js",
 			"injectScript.js",
 			"injectManifest.js"
 		]
