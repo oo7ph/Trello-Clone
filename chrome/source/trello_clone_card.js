@@ -4,18 +4,23 @@ $(".card-operation.js-card-menu").livequery("click", function() {
 
 	// set a short timeout to wait for the popover to appear
 	setTimeout(function() {
-		addCopyCardLink(cardEl);
+		addCopyCardLink(cardEl.data("card"));
 	}, 50);
 });
 
 /** Adds a "Copy Card" link to the currently active popover. */
-var addCopyCardLink = function(cardEl) {
+var addCopyCardLink = function(cardModel) {
+
+	// create the link
 	var copyCardLink = $("<a>Copy Card</a>");
+
+	// bind a click event that copies the card to the same list
 	copyCardLink.bind("click", function() {
-		var cardModel = cardEl.data("card");
 		copyCard(cardModel.getBoard().id, cardModel.getList().id, cardModel);
+		$(".pop-over").hide();
 	});
 
+	// add the link to the end of the pop over menu
 	$(".pop-over-list").append(
 		$("<li>").append(copyCardLink)
 	);
