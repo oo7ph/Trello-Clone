@@ -36,11 +36,6 @@ var cloneBoard = function(fromBoard, newBoardName) {
 		function(data) {
 		
 			var newBoardId = data._id;
-			
-			// archive default lists
-			//for(var i=0; i<data.lists.length; i++) {
-			//	archiveList(newBoardId, data.lists[i]._id);
-			//}
 
 			var archiveListQueue = _.map(data.lists, function(list) {
 				return function(callback) {
@@ -50,10 +45,6 @@ var cloneBoard = function(fromBoard, newBoardName) {
 			
 			// copy lists from current board into the new board
 			var listModels = boardView.model.listList.models;
-			//for(var i=0; i<listModels.length; i++) {
-			//	copyList(newBoardId, listModels[i], log);
-			//}
-			
 			var copyListQueue = _.map(listModels, function(listModel) {
 				return function(callback) {
 					copyList(newBoardId, listModel, callback);
@@ -80,15 +71,12 @@ var copyList = function(toBoardId, listModel, callback) {
 		
 		// copy cards
 		var cardModels = listModel.cardList.models;
-		//for(var i=0; i<cardModels.length; i++) {
-		//	copyCard(toBoardId, newListId, cardModels[i], log);
-		//}
-
 		var copyCardQueue = _.map(cardModels, function(cardModel) {
 			return function(callback) {
 				copyCard(toBoardId, newListId, cardModel, callback);
 			};
 		});
+		
 		callAfterDone(copyCardQueue, callback);
 	});
 }
@@ -120,22 +108,19 @@ var copyCard = function(toBoardId, toListId, cardModel, callback) {
 						return {"addToSet":{labels:label}};
 					}
 				)
-			});
+			}, callback);
+			
 		};
 
 		// copy checklists
 		var checklistModels = cardModel.checklistList.models;
-		//for(var i=0; i<checklistModels.length; i++) {
-		//	copyChecklist(toBoardId, toListId, newCardId, checklistModels[i], log);
-		//}
-
 		var copyQueue = _.map(checklistModels, function(checklistModel) {
 			return function(callback) {
 				copyChecklist(toBoardId, toListId, newCardId, checklistModel, callback);
 			};
 		});
 
-		callback();
+		// callback();
 		callAfterDone([updateAction].concat(copyQueue), callback);
 	});
 };
@@ -160,17 +145,6 @@ var copyChecklist = function(toBoardId, toListId, toCardId, checklistModel, call
 		}, function() {			
 			// copy tasks to checklist
 			var taskModels = checklistModel.checkItemList.models;
-			//for(var i=0; i<taskModels.length; i++) {
-			//	var task = taskModels[i].toJSON();
-			//	addTaskToChecklist({
-			//		idChecklist: 	newChecklistId,
-			//		name:		 	task.name,
-			//		pos:		 	task.pos,
-			//		idBoard: 	 	toBoardId
-			//		//idPlaceholder: 	"???"
-			//	});
-			//}
-
 			var addTaskQueue = _.map(taskModels, function(taskModel) {
 				return function(callback) {
 					var task = taskModel.toJSON();
@@ -180,9 +154,10 @@ var copyChecklist = function(toBoardId, toListId, toCardId, checklistModel, call
 						pos:		 	task.pos,
 						idBoard: 	 	toBoardId
 						//idPlaceholder: 	"???"
-					});
+					}, callback);
 				};
 			});
+			
 			callAfterDone(addTaskQueue, callback);
 		});
 	});
