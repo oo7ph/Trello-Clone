@@ -8,12 +8,11 @@
     {
 		"matches": ["https://trello.com/board/*"],
 		"js": [
-			"lib/jquery.min.js", 
-			"inject/livequery.js", 
-			"lib/injectScript.js", 
-			"source/inject.js", 
-			"inject/trello_clone_button.js", 
-			"inject/trello_clone.js"
+			"inject/jquery.livequery.js",
+			"inject/trello_clone_button.js",
+			"inject/trello_clone.js",
+			"injectScript.js",
+			"injectManifest.js"
 		]
 	}
   ]
