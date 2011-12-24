@@ -394,6 +394,10 @@ var post = function(args) {
 /** Invokes a callback after all the given asynchronous functions have completed. All asynchronous functions must accept a single callback argument. */
 var callAfterDone = function(queue, callback) {
 
+	if(!callback) {
+		return;
+	}
+
 	var count = queue.length;
 
 	if(count === 0) {
