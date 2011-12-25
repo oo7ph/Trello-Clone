@@ -16,7 +16,7 @@ var addClone = function(cardModel) {
 
 	// bind a click event that copies the card to the same list
 	cloneCardLink.bind("click", function() {
-		cloneCard(cardModel.getBoard().id, cardModel.getList().id, cardModel);
+		copyCard(cardModel.getBoard().id, cardModel.getList().id, cardModel);
 		$(".pop-over").hide();
 	});
 

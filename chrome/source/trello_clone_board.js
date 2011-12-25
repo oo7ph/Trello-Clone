@@ -394,15 +394,17 @@ var post = function(args) {
 /** Invokes a callback after all the given asynchronous functions have completed. All asynchronous functions must accept a single callback argument. */
 var callAfterDone = function(queue, callback) {
 
-	if(!callback) {
-		return;
-	}
+	// defaults
+	queue = queue || [];
+	callback = callback || function() {};
 
 	var count = queue.length;
 
+	// if the queue is empty, call the callback immediately
 	if(count === 0) {
 		callback();
 	}
+	// otherwise, call each function in the queue with a callback that decrements the count. When the count of remaining functions hits 0, call the final callback.
 	else {
 		var decAndCheck = function() {
 			if(--count <= 0) {

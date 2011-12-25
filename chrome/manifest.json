@@ -11,6 +11,8 @@
 			"inject/jquery.livequery.js",
 			"inject/trello_clone_button.js",
 			"inject/trello_clone_board.js",
+			"inject/trello_clone_card.js",
+			"inject/trello_clone_list.js",
 			"injectScript.js",
 			"injectManifest.js"
 		]
