@@ -8,7 +8,7 @@
 */
 
 /** Adds a button to the right board widget content area that allows the user to clone the current board. */
-$("a:contains(Board Profile)").livequery(function() {
+$("a:contains(Board Menu)").livequery(function() {
 	var boardContent = $(this).parent();
 	var button = $('<a class="button-link highlight-icon"> Clone Board </a>');
 	button.click(function() {
