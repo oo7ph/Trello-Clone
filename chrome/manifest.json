@@ -1,6 +1,6 @@
 {
   "name": "Trello Clone",
-  "version": "0.2",
+  "version": "0.3",
   "description": "Clone a Trello Board",
   "icons": { "128": "images/128-icon.png" },
   "homepage_url": "https://github.com/oo7ph/Trello-Clone",
