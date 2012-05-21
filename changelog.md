@@ -1,3 +1,6 @@
+v0.3.1
+* Fork from official repository in order to re-enable "Clone Board" feature
+
 v0.3
 * Updated selector for clone button to support Trello Changes.
 
